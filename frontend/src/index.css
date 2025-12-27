@@ -1,0 +1,107 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom scrollbar for Wuxia theme */
+@layer utilities {
+  .scrollbar-wuxia::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .scrollbar-wuxia::-webkit-scrollbar-track {
+    @apply bg-parchment-100 rounded-full;
+  }
+
+  .scrollbar-wuxia::-webkit-scrollbar-thumb {
+    @apply bg-stone-400 rounded-full;
+  }
+
+  .scrollbar-wuxia::-webkit-scrollbar-thumb:hover {
+    @apply bg-stone-500;
+  }
+
+  /* Brush stroke border effect */
+  .brush-border {
+    position: relative;
+  }
+
+  .brush-border::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border: 2px solid currentColor;
+    border-radius: 0.5rem;
+    opacity: 0.3;
+    filter: blur(1px);
+    
+    /* THÊM DÒNG NÀY ĐỂ CLICK XUYÊN QUA */
+    pointer-events: none; 
+    z-index: 0; /* Đảm bảo nó không tranh chấp layer nếu cần */
+  }
+
+  /* Character animation */
+  @keyframes character-appear {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-character-appear {
+    animation: character-appear 0.3s ease-out forwards;
+  }
+
+  /* Scroll shadow */
+  .scroll-shadow {
+    background:
+      linear-gradient(white 30%, rgba(255, 255, 255, 0)),
+      linear-gradient(rgba(255, 255, 255, 0), white 70%) 0 100%,
+      radial-gradient(farthest-side at 50% 0, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0)),
+      radial-gradient(farthest-side at 50% 100%, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0)) 0 100%;
+    background-repeat: no-repeat;
+    background-color: white;
+    background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
+    background-attachment: local, local, scroll, scroll;
+  }
+}
+
+/* Chinese character hover effect */
+.chinese-char {
+  @apply inline-block cursor-pointer transition-all duration-200;
+  @apply hover:text-cinnabar-700 hover:scale-110;
+}
+
+/* Message bubble animations */
+@keyframes bubble-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.message-bubble {
+  animation: bubble-appear 0.3s ease-out;
+}
+
+/* Emotion badge pulse */
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.emotion-pulse {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
