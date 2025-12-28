@@ -17,7 +17,20 @@ class RedisClient:
     """
     
     def __init__(self):
-        self.redis_url = settings.CHANNEL_LAYERS["default"]["CONFIG"]["hosts"][0]
+        # Lấy cấu hình host từ settings
+        # config có thể là tuple ('redis', 6379) HOẶC string "redis://..."
+        config = settings.CHANNEL_LAYERS["default"]["CONFIG"]["hosts"][0]
+        
+        # Logic xử lý thông minh:
+        if isinstance(config, (tuple, list)):
+            # Nếu là tuple ('redis', 6379) -> Chuyển thành chuỗi "redis://redis:6379"
+            host, port = config
+            self.redis_url = f"redis://{host}:{port}"
+        else:
+            # Nếu đã là string thì giữ nguyên
+            self.redis_url = config
+            
+        logger.info(f"Connecting to Redis at: {self.redis_url}")
         self._client: Optional[aioredis.Redis] = None
     
     async def get_client(self) -> aioredis.Redis:
@@ -65,10 +78,10 @@ class RedisClient:
             return []
     
     async def add_to_conversation_history(
-        self, 
-        user_id: str, 
+        self,
+        user_id: str,
         message: Dict[str, Any],
-        max_history: int = 100
+        max_history: int = 20
     ) -> bool:
         """
         Add a message to conversation history.

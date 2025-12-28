@@ -187,7 +187,7 @@ class ChineseTutorAgent:
                 temperature=0.9,  # More creative/personality
                 top_p=0.95,
                 top_k=40,
-                max_output_tokens=2048,
+                max_output_tokens=2048*4,
                 response_mime_type="application/json",
                 response_schema=self.RESPONSE_SCHEMA,
                 system_instruction=system_instruction

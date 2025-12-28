@@ -9,11 +9,18 @@ const SettingsModal = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
+  const handleRoleChange = (roleValue) => {
+
+        setUserRole(roleValue);
+
+        console.log("Đã đổi role ở client thành:", roleValue);
+        onClose();
+    };
   const roles = [
-    { value: 'Sư huynh', label: 'Sư huynh (师兄)', description: 'Senior Brother - Agent: Muội muội (Playful/Tsundere)' },
-    { value: 'Muội muội', label: 'Muội muội (妹妹)', description: 'Younger Sister - Agent: Tỷ tỷ (Caring/Strict)' },
-    { value: 'Đệ đệ', label: 'Đệ đệ (弟弟)', description: 'Younger Brother - Agent: Tỷ tỷ ác ma (Demon Sister)' },
-    { value: 'Tỷ tỷ', label: 'Tỷ tỷ (姐姐)', description: 'Older Sister - Agent: Muội muội (Sweet/Clingy)' },
+    { value: 'Sư huynh', label: 'Sư huynh', description: 'Senior Brother - Agent: Muội muội' },
+    { value: 'Muội muội', label: 'Muội muội', description: 'Younger Sister - Agent: Tỷ tỷ' },
+    { value: 'Đệ đệ', label: 'Đệ đệ', description: 'Younger Brother - Agent: Tỷ tỷ' },
+    { value: 'Tỷ tỷ', label: 'Tỷ tỷ', description: 'Older Sister - Agent: Muội muội' },
   ];
 
   return (
@@ -28,7 +35,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-chinese text-ink-900">
-            设置 • Cài đặt
+            Cài đặt vai trò
           </h2>
           <button
             onClick={onClose}
@@ -48,7 +55,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
             {roles.map((role) => (
               <button
                 key={role.value}
-                onClick={() => setUserRole(role.value)}
+                onClick={() => handleRoleChange(role.value)}
                 className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                   userRole === role.value
                     ? 'border-cinnabar-600 bg-cinnabar-50'

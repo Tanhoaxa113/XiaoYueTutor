@@ -1,16 +1,17 @@
 import { useState } from 'react';
-import { CheckCircle2, XCircle, Sparkles } from 'lucide-react';
+import { CheckCircle2, XCircle, Sparkles, Volume2, Loader2 } from 'lucide-react';
 import useChatStore from '../store/chatStore';
 import { getEmotionDisplay } from '../utils/emotionHelper';
+import { playAudioFromBase64 } from '../utils/audioPlayer';
 
 /**
  * Agent (AI) message bubble with Vietnamese text, pinyin, and interactive features
  */
 const AgentMessageBubble = ({ message }) => {
-  const { openHanziModal } = useChatStore();
+  const { openHanziModal, audioVolume } = useChatStore();
   const [quizAnswers, setQuizAnswers] = useState({});
   const [showQuizResults, setShowQuizResults] = useState({});
-
+  const [isPlaying, setIsPlaying] = useState(false);
   const {
     content,
     chinese_content,
@@ -19,10 +20,22 @@ const AgentMessageBubble = ({ message }) => {
     action,
     correction_detail,
     quiz_list = [],
+    audio_base64,
   } = message;
 
   const emotionDisplay = getEmotionDisplay(emotion);
-
+  const handlePlayAudio = async () => {
+    if (!audio_base64 || isPlaying) return;
+    
+    setIsPlaying(true);
+    try {
+      await playAudioFromBase64(audio_base64, audioVolume);
+    } catch (error) {
+      console.error("Lỗi phát audio:", error);
+    } finally {
+      setIsPlaying(false);
+    }
+  };
   // Handle clicking on Chinese characters
   const handleCharacterClick = (char) => {
     // Only Chinese characters (U+4E00 to U+9FFF)
@@ -197,7 +210,7 @@ const AgentMessageBubble = ({ message }) => {
   // Render correction highlighting
   const renderCorrection = () => {
     // Ưu tiên 1: Cách mới (Xịn) - Chỉ hiện khi có object correction_detail
-    if (correction_detail && !correction_detail.is_correct) {
+    if (action === 'correction' && correction_detail && !correction_detail.is_correct) {
       return (
         <div className="mt-3 p-3 bg-red-50 border-l-4 border-red-500 rounded-r-lg space-y-2 animate-pulse-subtle">
           {/* Hiện lỗi sai */}
@@ -263,10 +276,35 @@ const AgentMessageBubble = ({ message }) => {
             </p>
           )}
 
-          {/* Emotion badge */}
-          <div className={`inline-flex items-center gap-1 mt-2 px-2 py-1 rounded-full text-xs ${emotionDisplay.color} bg-stone-100 emotion-pulse`}>
-            <span>{emotionDisplay.emoji}</span>
-            <span className="font-serif">{emotionDisplay.text}</span>
+          <div className="flex items-center gap-2 mt-2">
+            
+            {/* Emotion Badge cũ */}
+            <div className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs ${emotionDisplay.color} bg-stone-100 emotion-pulse`}>
+              <span>{emotionDisplay.emoji}</span>
+              <span className="font-serif">{emotionDisplay.text}</span>
+            </div>
+
+            {/* --- NÚT PHÁT LẠI MỚI --- */}
+            {audio_base64 && (
+              <button
+                onClick={handlePlayAudio}
+                disabled={isPlaying}
+                className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs transition-all border border-stone-200 
+                  ${isPlaying 
+                    ? 'bg-cinnabar-100 text-cinnabar-700' 
+                    : 'bg-stone-50 text-stone-600 hover:bg-stone-200 hover:text-stone-800'
+                  }`}
+                title="Nghe lại"
+              >
+                {isPlaying ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <Volume2 className="w-3 h-3" />
+                )}
+                <span className="font-serif">Nghe</span>
+              </button>
+            )}
+            
           </div>
 
           {/* Correction */}

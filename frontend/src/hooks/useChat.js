@@ -2,7 +2,6 @@ import { useEffect, useRef, useCallback } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 import useChatStore from '../store/chatStore';
 import { playAudioFromBase64 } from '../utils/audioPlayer';
-
 /**
  * Custom hook for WebSocket chat connection and message handling
  */
@@ -118,7 +117,10 @@ const useChat = () => {
       if (data.emotion) {
         setAgentState(data.emotion, data.sulking_level);
       }
-
+      if (data.action === 'volume_updated') {
+          console.log('🔊 Volume updated on server:', data.volume);
+          return;
+      }
       // Add agent message to chat
       addMessage({
         role: 'assistant',
@@ -130,6 +132,7 @@ const useChat = () => {
         quiz_list: data.quiz_list || [],
         sulking_level: data.sulking_level,
         correction_detail: data.correction_detail || null,
+        audio_base64: data.audio_base64,
       });
 
       // Queue audio if available
@@ -146,7 +149,7 @@ const useChat = () => {
         content: `Lỗi: ${message}`,
       });
     }
-  }, [lastJsonMessage, addMessage, setAgentState, setIsTyping, enqueueAudio, audioUnlocked, audioVolume]);
+  }, [lastJsonMessage, addMessage, setAgentState, setIsTyping, enqueueAudio, audioUnlocked]);
 
   // Send message function
   const sendMessage = useCallback((text) => {
@@ -167,16 +170,18 @@ const useChat = () => {
       user_role: userRole,
     });
   }, [readyState, addMessage, sendJsonMessage, userRole]);
-
+  
   // Reset conversation
   const resetConversation = useCallback(() => {
     sendJsonMessage({
       action: 'reset',
+      user_role: userRole,
+      
     });
-    
+    console.log(userRole),
     useChatStore.getState().clearMessages();
     setAgentState('neutral', 0);
-  }, [sendJsonMessage, setAgentState]);
+  }, [sendJsonMessage, setAgentState, userRole]);
 
   // Get current state
   const getUserState = useCallback(() => {
@@ -201,7 +206,22 @@ const useChat = () => {
     isConnected: readyState === ReadyState.OPEN,
     connectionState: readyState,
   };
-};
+  useEffect(() => {
 
+    const timeoutId = setTimeout(() => {
+      if (readyState === ReadyState.OPEN) {
+        console.log('Sending volume update:', audioVolume);
+        sendJsonMessage({
+          action: 'set_volume',
+          volume: audioVolume,
+        });
+      }
+    }, 500); // Delay 500ms
+
+    // Nếu audioVolume thay đổi trước khi hết 500ms, hủy lệnh gửi cũ đi
+    return () => clearTimeout(timeoutId);
+  }, [audioVolume, readyState, sendJsonMessage]);
+};
+  
 export default useChat;
 
