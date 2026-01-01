@@ -8,8 +8,23 @@ import logging
 from io import BytesIO
 from typing import Optional
 import edge_tts
+import re
 
 logger = logging.getLogger(__name__)
+
+def _sanitize_text_for_audio(text: str) -> str:
+    """
+    Hàm độc lập (Helper function) để xử lý text.
+    Không có 'self' vì không nằm trong class.
+    """
+    if not text:
+        return ""
+    
+    # 1. Thay thế dấu ba chấm (...) hoặc (……) bằng dấu phẩy (，) để ngắt giọng
+    cleaned_text = re.sub(r'(\.{2,}|…+)', '，', text)
+    
+    # 2. Xử lý các ký tự lạ khác nếu cần
+    return cleaned_text
 
 
 async def generate_tts_audio(
@@ -35,11 +50,12 @@ async def generate_tts_audio(
         Base64 encoded audio string (MP3 format), or None if failed
     """
     try:
+        tts_text = _sanitize_text_for_audio(text)
         logger.info(f"Generating TTS for text: {text[:50]}... with voice: {voice}")
         
         # Create TTS communicator
         communicate = edge_tts.Communicate(
-            text=text,
+            text=tts_text,
             voice=voice,
             rate=rate,
             volume=volume
@@ -110,38 +126,38 @@ VOICE_PRESETS = {
     },
     "happy": {
         "voice": "zh-CN-XiaoxiaoNeural",
-        "rate": "+5%",
-        "volume": "+5%"
+        "rate": "+10%",
+        "volume": "+10%"
     },
     "excited": {
+        "voice": "zh-CN-XiaoxiaoNeural",
+        "rate": "+15%",
+        "volume": "+20%"
+    },
+    "cheerful": {
         "voice": "zh-CN-XiaoxiaoNeural",
         "rate": "+10%",
         "volume": "+10%"
     },
-    "cheerful": {
-        "voice": "zh-CN-XiaoxiaoNeural",
-        "rate": "+8%",
-        "volume": "+5%"
-    },
     "strict": {
         "voice": "zh-CN-XiaoxiaoNeural",
-        "rate": "+0%",
-        "volume": "+5%"
+        "rate": "-5%",
+        "volume": "+10%"
     },
     "concerned": {
         "voice": "zh-CN-XiaoxiaoNeural",
-        "rate": "-3%",
-        "volume": "+0%"
+        "rate": "-5%",
+        "volume": "-15%"
     },
     "sulking": {
         "voice": "zh-CN-XiaoxiaoNeural",
-        "rate": "-5%",
-        "volume": "-5%"
+        "rate": "-10%",
+        "volume": "-10%"
     },
     "angry": {
         "voice": "zh-CN-XiaoxiaoNeural",
-        "rate": "+0%",
-        "volume": "+10%"
+        "rate": "+20%",
+        "volume": "+25%"
     }
 }
 

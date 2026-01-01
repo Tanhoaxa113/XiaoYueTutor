@@ -102,6 +102,7 @@ wcwidth==0.2.14
 websockets==15.0.1
 yarl==1.22.0
 zope.interface==8.1.1
+uuid6
 channels==3.0.5
 daphne==3.0.2
 channels-redis==3.4.1

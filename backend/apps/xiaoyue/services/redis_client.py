@@ -78,10 +78,10 @@ class RedisClient:
             return []
     
     async def add_to_conversation_history(
-        self,
-        user_id: str,
+        self, 
+        user_id: str, 
         message: Dict[str, Any],
-        max_history: int = 20
+        max_history: int = 100
     ) -> bool:
         """
         Add a message to conversation history.

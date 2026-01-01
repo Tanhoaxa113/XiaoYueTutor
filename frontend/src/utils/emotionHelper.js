@@ -6,14 +6,14 @@
  * Emotion to emoji mapping
  */
 export const EMOTION_EMOJIS = {
-  neutral: '😊',
-  happy: '😄',
-  excited: '🤩',
-  cheerful: '😁',
-  strict: '😠',
-  concerned: '😟',
-  sulking: '😤',
-  angry: '😡',
+  neutral: '',
+  happy: '',
+  excited: '',
+  cheerful: '',
+  strict: '',
+  concerned: '',
+  sulking: '',
+  angry: '',
 };
 
 /**
