@@ -41,6 +41,10 @@ INSTALLED_APPS = [
     'rest_framework',
 
     'apps.xiaoyue',
+    'apps.users',
+    'apps.core',
+    'apps.trans',
+    'apps.exams',
 
 ]
 
